@@ -12,19 +12,20 @@ import (
 )
 
 type KVText struct {
-	dbname  string
+	meta    Meta
 	rwmutex sync.RWMutex
 }
 
 func (store *KVText) Init(conf string) {
-	store.dbname = conf + ".txt"
+	store.meta.DBName = conf + ".txt"
+	store.meta.Capacity = 0
 }
 
 func (store *KVText) Get(key string) (value string, err error) {
 	store.rwmutex.RLock()
 	defer store.rwmutex.RUnlock()
 
-	f, err := os.Open(store.dbname)
+	f, err := os.Open(store.meta.DBName)
 	if err != nil {
 		return
 	}
@@ -50,7 +51,7 @@ func (store *KVText) Set(key string, value string) (err error) {
 	store.rwmutex.Lock()
 	defer store.rwmutex.Unlock()
 
-	f, err := os.OpenFile(store.dbname, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	f, err := os.OpenFile(store.meta.DBName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		fmt.Println("Open file failed")
 		return
@@ -72,7 +73,7 @@ func (store *KVText) Count() (count int64) {
 	store.rwmutex.RLock()
 	defer store.rwmutex.RUnlock()
 
-	f, err := os.Open(store.dbname)
+	f, err := os.Open(store.meta.DBName)
 	if err != nil {
 		return 0
 	}
@@ -86,4 +87,8 @@ func (store *KVText) Count() (count int64) {
 	}
 
 	return count
+}
+
+func (store *KVText) GetMeta() (meta *Meta) {
+	return &store.meta
 }

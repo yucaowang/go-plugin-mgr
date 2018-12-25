@@ -4,11 +4,12 @@
 package main
 
 import (
+	"kvstore"
 	"sync"
 )
 
 type KVMem struct {
-	dbname  string
+	meta    kvstore.Meta
 	data    map[string]string
 	rwmutex sync.RWMutex
 }
@@ -20,7 +21,8 @@ func GetInstance() interface{} {
 }
 
 func (store *KVMem) Init(conf string) {
-	store.dbname = conf
+	store.meta.DBName = conf
+	store.meta.Capacity = 0
 	store.data = make(map[string]string)
 }
 
@@ -45,4 +47,8 @@ func (store *KVMem) Count() (count int64) {
 	defer store.rwmutex.RUnlock()
 
 	return (int64)(len(store.data))
+}
+
+func (store *KVMem) GetMeta() (meta *kvstore.Meta) {
+	return &store.meta
 }

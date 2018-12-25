@@ -6,12 +6,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"kvstore"
 	"os"
 	"sync"
 )
 
 type KVJson struct {
-	dbname   string
+	meta     kvstore.Meta
 	jsondata map[string]string
 	rwmutex  sync.RWMutex
 }
@@ -23,7 +24,8 @@ func GetInstance() interface{} {
 }
 
 func (store *KVJson) Init(conf string) {
-	store.dbname = conf + ".json"
+	store.meta.DBName = conf + ".json"
+	store.meta.Capacity = 0
 	store.jsondata = make(map[string]string)
 	store.loadData()
 }
@@ -52,12 +54,16 @@ func (store *KVJson) Count() (count int64) {
 	return (int64)(len(store.jsondata))
 }
 
+func (store *KVJson) GetMeta() (meta *kvstore.Meta) {
+	return &store.meta
+}
+
 func (store *KVJson) loadData() {
 	store.rwmutex.RLock()
 	defer store.rwmutex.RUnlock()
 
 	// get config file
-	f, err := os.Open(store.dbname)
+	f, err := os.Open(store.meta.DBName)
 	if err != nil {
 		fmt.Println("load kv data file failed, cannot open file, err=", err)
 	}
@@ -73,7 +79,7 @@ func (store *KVJson) loadData() {
 }
 
 func (store *KVJson) flush() (err error) {
-	f, err := os.OpenFile(store.dbname, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(store.meta.DBName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		fmt.Println("Open file failed")
 		return

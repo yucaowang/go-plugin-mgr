@@ -4,16 +4,22 @@ import "pluginmgr"
 
 const KV_PLUGIN_NAME = "kvstore"
 
+type Meta struct {
+	DBName   string
+	Capacity int
+}
+
 type KVStore interface {
 	Init(string)
 	Get(string) (string, error)
 	Set(string, string) error
 	Count() int64
+	GetMeta() *Meta
 }
 
-func NewKVStore(pm *pluginmgr.PluginMgr) (store KVStore, err error) {
+func NewKVStore(pm *pluginmgr.PluginMgr, subType string) (store KVStore, err error) {
 	var iface interface{}
-	iface, err = pm.GetPlugin(KV_PLUGIN_NAME)
+	iface, err = pm.CreatePluginInstance(KV_PLUGIN_NAME, subType)
 	if err != nil {
 		return
 	}
