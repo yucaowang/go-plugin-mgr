@@ -17,9 +17,8 @@ type KVJson struct {
 	rwmutex  sync.RWMutex
 }
 
-var kvjson KVJson
-
 func GetInstance() interface{} {
+	kvjson := KVJson{}
 	return &kvjson
 }
 

@@ -14,9 +14,8 @@ type KVMem struct {
 	rwmutex sync.RWMutex
 }
 
-var kvmem KVMem
-
 func GetInstance() interface{} {
+	kvmem := KVMem{}
 	return &kvmem
 }
 

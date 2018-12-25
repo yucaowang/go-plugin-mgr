@@ -17,8 +17,8 @@ The core plugin framework is called `PluginMgr`, this module would load plugin c
 
 There are two public functions in PluginMgr:
 
-* `Init`: initialize and return a instance of PluginMgr.
-* `GetPlugin`: retrieve the plugin instance by plugin name, the plugin name should be the same with the configuration in `plugin.conf`.
+* `CreateMgr`: initialize and return a instance of PluginMgr.
+* `CreatePluginInstance`: create a instance of plugin by plugin name and subtype, the plugin name and subtype should be the same with the configuration in `plugin.conf`.
 
 ### 2.2 Define interface
 
@@ -41,10 +41,9 @@ type KVStore interface {
 `PluginMgr` assumes all plugins have a public function named `GetInstance`, so your plugin should implement this function.
 
 ```go
-var yourstore YourKVStore
-
 func GetInstance() interface{} {
-    return &yourstore
+    kvmem := KVMem{}
+    return &kvmem
 }
 ```
 
